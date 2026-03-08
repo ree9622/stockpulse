@@ -1,6 +1,6 @@
 {
-  "name": "StockPulse - 한국 주식 실시간 정보",
-  "short_name": "StockPulse",
+  "name": "주식갤 - 한국 주식 실시간 정보",
+  "short_name": "주식갤",
   "description": "실시간 주식 정보, 히트맵, 뉴스, 종목 스크리너",
   "start_url": "/stockpulse",
   "scope": "/stockpulse/",

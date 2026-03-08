@@ -103,7 +103,7 @@ export default function Header() {
         >
           <TrendingUp className="w-6 h-6 text-emerald-400" />
           <span className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            StockPulse
+            주식갤
           </span>
         </Link>
 

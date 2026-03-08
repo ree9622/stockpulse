@@ -7,7 +7,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "StockPulse | 한국 주식 실시간 정보",
+  title: "주식갤 | 한국 주식 실시간 정보",
   description: "실시간 주식 정보, 히트맵, 뉴스, 트래쉬토크 커뮤니티",
   manifest: "/stockpulse/manifest.json",
   appleWebApp: {

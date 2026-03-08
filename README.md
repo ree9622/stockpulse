@@ -1,11 +1,11 @@
-# StockPulse 📈
+# 주식갤 (StockGall) 📈
 
 한국 주식 실시간 정보 & 커뮤니티 플랫폼
 
 ## 🌐 Live
 
-- **Frontend**: https://ree9622.github.io/stockpulse/
-- **API Server**: http://3.38.241.182
+- **Frontend**: https://stockgall.click/stockpulse/
+- **API Server**: https://stockgall.click
 
 ## ✨ Features
 

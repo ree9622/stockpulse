@@ -27,10 +27,10 @@ export default function LoginPage() {
           <div className="flex items-center justify-center gap-2 mb-2">
             <TrendingUp className="w-8 h-8 text-emerald-400" />
             <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              StockPulse
+              주식갤
             </span>
           </div>
-          <p className="text-sm text-gray-500">한국 주식 실시간 정보 & 커뮤니티</p>
+          <p className="text-sm text-gray-500">한국 주식 실시간 정보 & 트래쉬토크</p>
         </div>
 
         {/* OAuth 로그인 */}
