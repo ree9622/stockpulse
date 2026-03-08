@@ -28,6 +28,9 @@ export interface NewsItem {
   views: number;
   sentiment: "positive" | "negative" | "neutral";
   url?: string;
+  content?: string;
+  analysis?: string;
+  sourceUrl?: string;
 }
 
 export interface ChatMessage {

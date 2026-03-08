@@ -56,15 +56,21 @@ export async function putNewsItem(news: {
   views: number;
   sentiment: string;
   url?: string;
+  content?: string;
+  analysis?: string;
+  sourceUrl?: string;
 }) {
   const timestamp = Date.now();
+  const item: Record<string, unknown> = { ...news, timestamp };
+  // Remove undefined fields
+  Object.keys(item).forEach((k) => item[k] === undefined && delete item[k]);
   await ddb.send(
     new PutCommand({
       TableName: TABLES.news,
-      Item: { ...news, timestamp },
+      Item: item,
     })
   );
-  return { ...news, timestamp };
+  return { ...item, timestamp };
 }
 
 export async function getNewsBySource(source: string, limit = 20) {

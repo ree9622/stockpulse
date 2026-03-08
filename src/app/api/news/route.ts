@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { source, title, tags, views, sentiment, url } = body;
+    const { source, title, tags, views, sentiment, url, content, analysis, sourceUrl } = body;
 
     if (!source || !title) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
       views: views || 0,
       sentiment: sentiment || "neutral",
       url,
+      content,
+      analysis,
+      sourceUrl,
     });
     return NextResponse.json({ item });
   } catch (error) {
