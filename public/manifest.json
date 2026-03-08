@@ -1,0 +1,25 @@
+{
+  "name": "StockPulse - 한국 주식 실시간 정보",
+  "short_name": "StockPulse",
+  "description": "실시간 주식 정보, 히트맵, 뉴스, 종목 스크리너",
+  "start_url": "/stockpulse",
+  "scope": "/stockpulse/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/stockpulse/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/stockpulse/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

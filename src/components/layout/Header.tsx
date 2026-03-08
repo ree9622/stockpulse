@@ -2,9 +2,19 @@
 
 import { Search, Bell, TrendingUp } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { searchStocks, type StockListItem } from "@/lib/stock-list";
 import AuthButton from "./AuthButton";
+import ThemeToggle from "./ThemeToggle";
+
+const NAV_ITEMS = [
+  { label: "대시보드", href: "/stockpulse", scrollTo: null },
+  { label: "히트맵", href: "/stockpulse", scrollTo: "heatmap" },
+  { label: "스크리너", href: "/stockpulse/screener", scrollTo: null },
+  { label: "뉴스", href: "/stockpulse", scrollTo: "news" },
+  { label: "섹터", href: "/stockpulse/sectors", scrollTo: null },
+];
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +24,7 @@ export default function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const found = searchStocks(searchQuery);
@@ -22,7 +33,6 @@ export default function Header() {
     setSelectedIdx(-1);
   }, [searchQuery]);
 
-  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -37,6 +47,31 @@ export default function Header() {
     setSearchQuery("");
     setShowDropdown(false);
     router.push(`/stockpulse/stock/${code}`);
+  };
+
+  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
+    if (item.scrollTo) {
+      if (pathname === "/stockpulse" || pathname === "/stockpulse/") {
+        // Already on home page, scroll to section
+        const el = document.getElementById(item.scrollTo);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+      }
+      // Navigate to home then scroll
+      router.push(`/stockpulse#${item.scrollTo}`);
+    } else {
+      router.push(item.href);
+    }
+  };
+
+  const isActive = (item: typeof NAV_ITEMS[0]) => {
+    if (item.href === "/stockpulse" && !item.scrollTo) {
+      return pathname === "/stockpulse" || pathname === "/stockpulse/";
+    }
+    if (item.scrollTo) return false;
+    return pathname === item.href || pathname === item.href + "/";
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -59,34 +94,29 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-gray-800">
+    <header className="sticky top-0 z-50 bg-[#0a0a0f]/95 dark:bg-[#0a0a0f]/95 light:bg-white/95 backdrop-blur-md border-b border-gray-800 dark:border-gray-800 light:border-gray-200">
       <div className="max-w-[1800px] mx-auto px-4 h-14 flex items-center gap-4">
         {/* Logo */}
-        <div
-          className="flex items-center gap-2 shrink-0 cursor-pointer"
-          onClick={() => router.push("/stockpulse")}
+        <Link
+          href="/stockpulse"
+          className="flex items-center gap-2 shrink-0"
         >
           <TrendingUp className="w-6 h-6 text-emerald-400" />
           <span className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             StockPulse
           </span>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav className="hidden md:flex items-center gap-1 ml-4">
-          {[
-            { label: "대시보드", active: true },
-            { label: "히트맵", active: false },
-            { label: "스크리너", active: false },
-            { label: "뉴스", active: false },
-            { label: "섹터", active: false },
-          ].map((item) => (
+          {NAV_ITEMS.map((item) => (
             <button
               key={item.label}
+              onClick={() => handleNavClick(item)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                item.active
+                isActive(item)
                   ? "bg-emerald-500/15 text-emerald-400"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 dark:text-gray-400 dark:hover:text-gray-200"
               }`}
             >
               {item.label}
@@ -108,13 +138,12 @@ export default function Header() {
               onFocus={() => {
                 if (results.length > 0) setShowDropdown(true);
               }}
-              className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-colors"
+              className="w-full bg-gray-800/50 dark:bg-gray-800/50 border border-gray-700/50 dark:border-gray-700/50 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-200 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-colors"
             />
           </div>
 
-          {/* 자동완성 드롭다운 */}
           {showDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#12121a] border border-gray-700/50 rounded-lg shadow-xl shadow-black/50 overflow-hidden z-50">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#12121a] dark:bg-[#12121a] border border-gray-700/50 rounded-lg shadow-xl shadow-black/50 overflow-hidden z-50">
               {results.map((item, idx) => (
                 <button
                   key={item.code}
@@ -135,7 +164,8 @@ export default function Header() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
+          <ThemeToggle />
           <button className="relative p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 rounded-lg transition-colors">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />

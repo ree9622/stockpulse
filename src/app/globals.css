@@ -3,6 +3,56 @@
 :root {
   --background: #0a0a0f;
   --foreground: #e5e7eb;
+  --card-bg: #12121a;
+  --border: #1f2937;
+}
+
+html.light {
+  --background: #f8fafc;
+  --foreground: #1e293b;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+}
+
+html.light body {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+html.light [class*="bg-[#0a0a0f]"] {
+  background-color: #f8fafc !important;
+}
+
+html.light [class*="bg-[#12121a]"] {
+  background-color: #ffffff !important;
+}
+
+html.light [class*="border-gray-800"] {
+  border-color: #e2e8f0 !important;
+}
+
+html.light [class*="border-gray-700"] {
+  border-color: #cbd5e1 !important;
+}
+
+html.light [class*="text-gray-200"] {
+  color: #1e293b !important;
+}
+
+html.light [class*="text-gray-300"] {
+  color: #334155 !important;
+}
+
+html.light [class*="text-gray-400"] {
+  color: #64748b !important;
+}
+
+html.light [class*="text-gray-500"] {
+  color: #94a3b8 !important;
+}
+
+html.light [class*="bg-gray-800"] {
+  background-color: rgba(241, 245, 249, 0.8) !important;
 }
 
 body {
@@ -27,6 +77,13 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #4b5563;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Ticker scroll animation */

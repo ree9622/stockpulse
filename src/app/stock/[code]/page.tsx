@@ -10,6 +10,7 @@ import {
   BarChart3,
   Newspaper,
   RefreshCw,
+  Bell,
 } from "lucide-react";
 import {
   LineChart,
@@ -22,6 +23,7 @@ import {
 } from "recharts";
 import { formatPrice, formatPercent, formatNumber, getChangeColor } from "@/lib/utils";
 import type { StockDetail } from "@/lib/stock-api";
+import AlertModal from "@/components/market/AlertModal";
 
 interface HistoryPoint {
   date: string;
@@ -36,6 +38,8 @@ export default function StockDetailPage() {
   const [history, setHistory] = useState<HistoryPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +71,34 @@ export default function StockDetailPage() {
 
     fetchData();
   }, [code]);
+
+  const handleAlertSubmit = async (data: { targetPrice: number; direction: "above" | "below" }) => {
+    try {
+      const res = await fetch("/stockpulse/api/alerts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "anonymous",
+          stockCode: code,
+          stockName: detail?.name || code,
+          targetPrice: data.targetPrice,
+          direction: data.direction,
+        }),
+      });
+
+      if (res.ok) {
+        setAlertMsg("✅ 알림이 설정되었습니다");
+        setShowAlertModal(false);
+        setTimeout(() => setAlertMsg(null), 3000);
+      } else {
+        setAlertMsg("❌ 알림 설정에 실패했습니다");
+        setTimeout(() => setAlertMsg(null), 3000);
+      }
+    } catch {
+      setAlertMsg("❌ 네트워크 오류가 발생했습니다");
+      setTimeout(() => setAlertMsg(null), 3000);
+    }
+  };
 
   if (loading) {
     return (
@@ -114,12 +146,28 @@ export default function StockDetailPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <h1 className="text-lg font-bold text-gray-200">{detail.name}</h1>
             <span className="text-sm text-gray-500">{detail.code}</span>
           </div>
+          <button
+            onClick={() => setShowAlertModal(true)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-lg text-sm text-emerald-400 font-medium hover:bg-emerald-500/25 transition-colors"
+          >
+            <Bell className="w-4 h-4" />
+            알림 설정
+          </button>
         </div>
       </header>
+
+      {/* Alert message */}
+      {alertMsg && (
+        <div className="max-w-[1200px] mx-auto px-4 pt-2">
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-2 text-sm text-emerald-400">
+            {alertMsg}
+          </div>
+        </div>
+      )}
 
       <main className="max-w-[1200px] mx-auto px-4 py-6 space-y-6">
         {/* 현재가 + 등락 */}
@@ -159,7 +207,7 @@ export default function StockDetailPage() {
                     dataKey="date"
                     stroke="#4a4a5a"
                     tick={{ fontSize: 11 }}
-                    tickFormatter={(v: string) => v.slice(5)} // MM-DD
+                    tickFormatter={(v: string) => v.slice(5)}
                   />
                   <YAxis
                     stroke="#4a4a5a"
@@ -221,6 +269,17 @@ export default function StockDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Alert Modal */}
+      {showAlertModal && (
+        <AlertModal
+          stockCode={code}
+          stockName={detail.name}
+          currentPrice={detail.price}
+          onClose={() => setShowAlertModal(false)}
+          onSubmit={handleAlertSubmit}
+        />
+      )}
     </div>
   );
 }

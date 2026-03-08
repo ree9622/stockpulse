@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, QueryCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, ScanCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || "ap-northeast-2",
@@ -12,6 +12,7 @@ const TABLES = {
   news: "stockpulse-news",
   stocks: "stockpulse-stocks",
   users: "stockpulse-users",
+  alerts: "stockpulse-alerts",
 } as const;
 
 // ━━━ Chat ━━━
@@ -140,6 +141,47 @@ export async function putUser(user: {
     })
   );
   return { ...user, createdAt };
+}
+
+// ━━━ Alerts ━━━
+
+export async function putAlert(alert: {
+  userId: string;
+  stockCode: string;
+  stockName: string;
+  targetPrice: number;
+  direction: "above" | "below";
+}) {
+  const createdAt = Date.now();
+  const item = { ...alert, createdAt, active: true };
+  await ddb.send(
+    new PutCommand({
+      TableName: TABLES.alerts,
+      Item: item,
+    })
+  );
+  return item;
+}
+
+export async function getAlerts(userId: string) {
+  const result = await ddb.send(
+    new QueryCommand({
+      TableName: TABLES.alerts,
+      KeyConditionExpression: "userId = :u",
+      ExpressionAttributeValues: { ":u": userId },
+      ScanIndexForward: false,
+    })
+  );
+  return result.Items || [];
+}
+
+export async function deleteAlert(userId: string, createdAt: number) {
+  await ddb.send(
+    new DeleteCommand({
+      TableName: TABLES.alerts,
+      Key: { userId, createdAt },
+    })
+  );
 }
 
 export { ddb, TABLES };

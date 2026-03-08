@@ -19,12 +19,12 @@ export default function Home() {
         {/* 메인 그리드 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 왼쪽: 히트맵 */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" id="heatmap">
             <Heatmap />
           </div>
 
           {/* 오른쪽: 뉴스 */}
-          <div>
+          <div id="news">
             <NewsFeed />
           </div>
         </div>
