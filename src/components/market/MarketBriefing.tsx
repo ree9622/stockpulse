@@ -252,7 +252,7 @@ export default function MarketBriefing() {
                               {thread.stocks.map((s) => (
                                 <button
                                   key={s.code}
-                                  onClick={(e) => { e.stopPropagation(); router.push(`/stockpulse/stock/${s.code}`); }}
+                                  onClick={(e) => { e.stopPropagation(); router.push(`/stock/${s.code}`); }}
                                   className="inline-flex items-center gap-1 px-2 py-1 bg-gray-800/60 hover:bg-gray-700/60 rounded-md text-[11px] font-medium transition-colors active:scale-95"
                                 >
                                   <span className="text-gray-300">{s.name}</span>
@@ -330,7 +330,7 @@ export default function MarketBriefing() {
                                   {thread.stocks.map((s) => (
                                     <button
                                       key={s.code}
-                                      onClick={(e) => { e.stopPropagation(); router.push(`/stockpulse/stock/${s.code}`); }}
+                                      onClick={(e) => { e.stopPropagation(); router.push(`/stock/${s.code}`); }}
                                       className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-800/60 hover:bg-gray-700/60 rounded text-[10px] font-medium transition-colors"
                                     >
                                       <span className="text-gray-300">{s.name}</span>

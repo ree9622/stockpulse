@@ -121,7 +121,7 @@ export default function SectorsPage() {
                     .map((stock) => (
                       <tr
                         key={stock.code}
-                        onClick={() => router.push(`/stockpulse/stock/${stock.code}`)}
+                        onClick={() => router.push(`/stock/${stock.code}`)}
                         className="border-b border-gray-800/30 dark:border-gray-800/30 hover:bg-gray-800/30 dark:hover:bg-gray-800/30 cursor-pointer transition-colors"
                       >
                         <td className="px-4 py-3">

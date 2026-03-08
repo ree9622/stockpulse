@@ -74,7 +74,7 @@ export default function TrendingStocks() {
                 className="border-b border-gray-800/30 hover:bg-gray-800/30 cursor-pointer transition-colors"
               >
                 <td className="py-2.5 pr-2">
-                  <Link href={`/stockpulse/stock/${stock.code}`} className="block">
+                  <Link href={`/stock/${stock.code}`} className="block">
                     <div className="text-gray-200 font-medium text-sm hover:text-emerald-400 transition-colors">
                       {stock.name}
                     </div>

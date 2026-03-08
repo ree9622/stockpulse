@@ -9,11 +9,11 @@ import AuthButton from "./AuthButton";
 import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
-  { label: "대시보드", href: "/stockpulse", scrollTo: null },
-  { label: "히트맵", href: "/stockpulse", scrollTo: "heatmap" },
-  { label: "스크리너", href: "/stockpulse/screener", scrollTo: null },
-  { label: "뉴스", href: "/stockpulse", scrollTo: "news" },
-  { label: "섹터", href: "/stockpulse/sectors", scrollTo: null },
+  { label: "대시보드", href: "/", scrollTo: null },
+  { label: "히트맵", href: "/", scrollTo: "heatmap" },
+  { label: "스크리너", href: "/screener", scrollTo: null },
+  { label: "뉴스", href: "/", scrollTo: "news" },
+  { label: "섹터", href: "/sectors", scrollTo: null },
 ];
 
 export default function Header() {
@@ -59,28 +59,28 @@ export default function Header() {
     setSearchQuery("");
     setShowDropdown(false);
     setMobileSearchOpen(false);
-    router.push(`/stockpulse/stock/${code}`);
+    router.push(`/stock/${code}`);
   };
 
   const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
     setMobileMenuOpen(false);
     if (item.scrollTo) {
-      if (pathname === "/stockpulse" || pathname === "/stockpulse/") {
+      if (pathname === "/" || pathname === "/") {
         const el = document.getElementById(item.scrollTo);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
           return;
         }
       }
-      router.push(`/stockpulse#${item.scrollTo}`);
+      router.push(`/#${item.scrollTo}`);
     } else {
       router.push(item.href);
     }
   };
 
   const isActive = (item: typeof NAV_ITEMS[0]) => {
-    if (item.href === "/stockpulse" && !item.scrollTo) {
-      return pathname === "/stockpulse" || pathname === "/stockpulse/";
+    if (item.href === "/" && !item.scrollTo) {
+      return pathname === "/" || pathname === "";
     }
     if (item.scrollTo) return false;
     return pathname === item.href || pathname === item.href + "/";
@@ -117,7 +117,7 @@ export default function Header() {
           </button>
 
           {/* Logo */}
-          <Link href="/stockpulse" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
             <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
               주식갤

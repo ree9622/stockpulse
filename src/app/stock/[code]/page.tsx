@@ -113,7 +113,7 @@ export default function StockDetailPage() {
       <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4">
         <p className="text-gray-400">{error || "종목을 찾을 수 없습니다"}</p>
         <Link
-          href="/stockpulse"
+          href="/"
           className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -141,7 +141,7 @@ export default function StockDetailPage() {
       <header className="sticky top-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-gray-800">
         <div className="max-w-[1200px] mx-auto px-4 h-14 flex items-center gap-4">
           <Link
-            href="/stockpulse"
+            href="/"
             className="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

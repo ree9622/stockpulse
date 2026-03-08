@@ -34,7 +34,7 @@ export default function Heatmap() {
             return (
               <div
                 key={item.code}
-                onClick={() => router.push(`/stockpulse/stock/${item.code}`)}
+                onClick={() => router.push(`/stock/${item.code}`)}
                 className={`${getHeatmapColor(item.changePercent)} rounded-lg p-1.5 sm:p-2 flex flex-col justify-center items-center cursor-pointer hover:brightness-125 transition-all group relative active:scale-95`}
                 style={{ minHeight: `${height}px` }}
               >

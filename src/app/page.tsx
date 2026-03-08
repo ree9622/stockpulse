@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header";
 import MarketTicker from "@/components/market/MarketTicker";
 import MarketOverview from "@/components/market/MarketOverview";
+import EnergyDashboard from "@/components/market/EnergyDashboard";
 import MarketBriefing from "@/components/market/MarketBriefing";
 import Heatmap from "@/components/market/Heatmap";
 import TrendingStocks from "@/components/market/TrendingStocks";
@@ -16,6 +17,11 @@ export default function Home() {
       <main className="max-w-[1800px] mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* 지수 카드 */}
         <MarketOverview />
+
+        {/* 에너지·원자재·선물 모니터 */}
+        <div id="energy">
+          <EnergyDashboard />
+        </div>
 
         {/* 세이브티커 정세 브리핑 */}
         <div id="briefing">
