@@ -7,7 +7,6 @@ import type { ChatMessage } from "@/types";
 import { timeAgo } from "@/lib/utils";
 import { io, Socket } from "socket.io-client";
 
-// 랜덤 닉네임 생성
 const NICKNAMES = ["불타는곰", "삼전만년", "방산드림", "개미투자자", "차트쟁이", "워렌이형", "코인충", "국장탈출"];
 const myNickname = NICKNAMES[Math.floor(Math.random() * NICKNAMES.length)];
 const myUserId = `user-${Math.random().toString(36).slice(2, 8)}`;
@@ -28,65 +27,40 @@ export default function ChatPanel() {
   const currentRoom = chatRooms.find((r) => r.id === activeRoom)!;
   const roomMessages = messages.filter((m) => m.room === activeRoom);
 
-  // Socket.io 연결
   const connectSocket = useCallback(() => {
     if (socketRef.current?.connected) return;
-
     const socket = io({
       path: "/stockpulse/socket.io",
       transports: ["websocket", "polling"],
     });
-
     socket.on("connect", () => {
       setConnected(true);
       socket.emit("join-room", activeRoom);
     });
-
-    socket.on("disconnect", () => {
-      setConnected(false);
-    });
-
+    socket.on("disconnect", () => setConnected(false));
     socket.on("recent-messages", (msgs: ChatMessage[]) => {
       setMessages((prev) => {
-        // 기존 메시지와 서버 메시지 병합 (현재 방만)
         const otherRoomMsgs = prev.filter((m) => m.room !== activeRoom);
-        const serverMsgs = msgs.map((m) => ({
-          ...m,
-          timestamp: new Date(m.timestamp),
-        }));
+        const serverMsgs = msgs.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
         return [...otherRoomMsgs, ...serverMsgs];
       });
     });
-
     socket.on("new-message", (msg: ChatMessage) => {
       setMessages((prev) => [...prev, { ...msg, timestamp: new Date(msg.timestamp) }]);
     });
-
     socket.on("user-count", (data: { room: string; count: number }) => {
-      if (data.room === activeRoom) {
-        setUserCount(data.count);
-      }
+      if (data.room === activeRoom) setUserCount(data.count);
     });
-
     socketRef.current = socket;
   }, [activeRoom]);
 
-  // 패널 열릴 때 소켓 연결
   useEffect(() => {
-    if (isOpen) {
-      connectSocket();
-    }
-    return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-    };
+    if (isOpen) connectSocket();
+    return () => { socketRef.current?.disconnect(); socketRef.current = null; };
   }, [isOpen, connectSocket]);
 
-  // 방 변경 시
   useEffect(() => {
-    if (socketRef.current?.connected) {
-      socketRef.current.emit("join-room", activeRoom);
-    }
+    if (socketRef.current?.connected) socketRef.current.emit("join-room", activeRoom);
   }, [activeRoom]);
 
   useEffect(() => {
@@ -96,64 +70,54 @@ export default function ChatPanel() {
   const sendMessage = () => {
     if (!input.trim() || !socketRef.current?.connected) return;
     socketRef.current.emit("send-message", {
-      room: activeRoom,
-      userId: myUserId,
-      nickname: myNickname,
-      content: input.trim(),
+      room: activeRoom, userId: myUserId, nickname: myNickname, content: input.trim(),
     });
     setInput("");
     inputRef.current?.focus();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
-  // ━━━ 닫힌 상태: 플로팅 버튼 ━━━
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-50 bg-emerald-500 hover:bg-emerald-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 group"
+        className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 bg-emerald-500 hover:bg-emerald-400 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95"
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
         <span className="absolute inset-0 rounded-full bg-emerald-500/30 animate-ping" />
       </button>
     );
   }
 
-  // ━━━ 열린 상태: 채팅 패널 ━━━
   return (
     <div
-      className={`fixed z-50 bg-[#0d0d14] border border-gray-700/50 rounded-t-2xl shadow-2xl shadow-black/50 transition-all duration-300 ${
+      className={`fixed z-50 bg-[#0d0d14] border border-gray-700/50 shadow-2xl shadow-black/50 transition-all duration-300 ${
         isExpanded
-          ? "bottom-0 right-0 left-0 top-[10vh] rounded-t-2xl"
-          : "bottom-0 right-4 w-[380px] h-[520px] rounded-t-2xl"
+          ? "bottom-0 right-0 left-0 top-0 sm:top-[10vh] rounded-none sm:rounded-t-2xl"
+          : "bottom-0 right-0 left-0 sm:left-auto sm:right-4 sm:w-[380px] h-[100dvh] sm:h-[520px] rounded-none sm:rounded-t-2xl"
       }`}
     >
-      {/* ━━━ Header ━━━ */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/50 cursor-pointer select-none">
-        <div className="flex items-center gap-2" onClick={() => setShowRooms(!showRooms)}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 sm:px-4 py-3 border-b border-gray-800/50 cursor-pointer select-none safe-area-top">
+        <div className="flex items-center gap-2 min-w-0" onClick={() => setShowRooms(!showRooms)}>
           <span className="text-lg">{currentRoom.icon}</span>
-          <span className="text-sm font-bold text-gray-200">{currentRoom.name}</span>
-          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showRooms ? "rotate-180" : ""}`} />
-          <span className="flex items-center gap-1 text-xs text-gray-500 ml-2">
+          <span className="text-sm font-bold text-gray-200 truncate">{currentRoom.name}</span>
+          <ChevronDown className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${showRooms ? "rotate-180" : ""}`} />
+          <span className="flex items-center gap-1 text-xs text-gray-500 ml-1 shrink-0">
             <Users className="w-3 h-3" />
             <span className={connected ? "text-emerald-400" : "text-gray-600"}>
               {userCount > 0 ? userCount : currentRoom.userCount}
             </span>
           </span>
-          {!connected && (
-            <span className="text-[10px] text-yellow-500">연결 중...</span>
-          )}
+          {!connected && <span className="text-[10px] text-yellow-500 shrink-0">연결 중...</span>}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors text-xs"
+            className="hidden sm:block p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors text-xs"
           >
             {isExpanded ? "축소" : "확대"}
           </button>
@@ -161,37 +125,35 @@ export default function ChatPanel() {
             onClick={() => { setIsOpen(false); setIsExpanded(false); }}
             className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
 
-      {/* ━━━ Room Selector ━━━ */}
+      {/* Room Selector */}
       {showRooms && (
         <div className="absolute top-[52px] left-0 right-0 bg-[#0d0d14] border-b border-gray-800/50 z-10 p-2 space-y-1">
           {chatRooms.map((room) => (
             <button
               key={room.id}
               onClick={() => { setActiveRoom(room.id); setShowRooms(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                activeRoom === room.id
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "text-gray-400 hover:bg-gray-800/50 hover:text-gray-200"
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
+                activeRoom === room.id ? "bg-emerald-500/10 text-emerald-400" : "text-gray-400 hover:bg-gray-800/50 hover:text-gray-200"
               }`}
             >
               <span className="text-lg">{room.icon}</span>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium">{room.name}</div>
-                <div className="text-xs text-gray-500">{room.description}</div>
+                <div className="text-xs text-gray-500 truncate">{room.description}</div>
               </div>
-              <span className="text-xs text-gray-600">{room.userCount}</span>
+              <span className="text-xs text-gray-600 shrink-0">{room.userCount}</span>
             </button>
           ))}
         </div>
       )}
 
-      {/* ━━━ Messages ━━━ */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: isExpanded ? "calc(100% - 120px)" : "390px" }}>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ height: isExpanded ? "calc(100dvh - 120px)" : "calc(100dvh - 120px)" }}>
         {roomMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <Hash className="w-10 h-10 mb-2 opacity-30" />
@@ -220,8 +182,8 @@ export default function ChatPanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ━━━ Input ━━━ */}
-      <div className="px-3 py-3 border-t border-gray-800/50">
+      {/* Input */}
+      <div className="px-3 py-3 border-t border-gray-800/50 safe-area-bottom">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}
@@ -230,12 +192,12 @@ export default function ChatPanel() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={`${currentRoom.name}에 메시지 입력...`}
-            className="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-colors"
+            className="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-2.5 text-base sm:text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-colors"
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || !connected}
-            className="p-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors"
+            className="p-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors active:scale-95"
           >
             <Send className="w-4 h-4" />
           </button>

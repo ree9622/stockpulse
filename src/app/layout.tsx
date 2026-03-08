@@ -4,6 +4,10 @@ import SessionProvider from "@/components/layout/SessionProvider";
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0f",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -13,7 +17,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "StockPulse",
+    title: "주식갤",
   },
 };
 
@@ -27,9 +31,10 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
         <link rel="apple-touch-icon" href="/stockpulse/icon-192.svg" />
       </head>
-      <body className="bg-[#0a0a0f] dark:bg-[#0a0a0f] text-gray-200 dark:text-gray-200 antialiased min-h-screen">
+      <body className="bg-[#0a0a0f] dark:bg-[#0a0a0f] text-gray-200 dark:text-gray-200 antialiased min-h-[100dvh] overscroll-none">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
