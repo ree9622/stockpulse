@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header";
 import MarketTicker from "@/components/market/MarketTicker";
 import MarketOverview from "@/components/market/MarketOverview";
+import MarketBriefing from "@/components/market/MarketBriefing";
 import Heatmap from "@/components/market/Heatmap";
 import TrendingStocks from "@/components/market/TrendingStocks";
 import NewsFeed from "@/components/market/NewsFeed";
@@ -15,6 +16,11 @@ export default function Home() {
       <main className="max-w-[1800px] mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* 지수 카드 */}
         <MarketOverview />
+
+        {/* 세이브티커 정세 브리핑 */}
+        <div id="briefing">
+          <MarketBriefing />
+        </div>
 
         {/* 메인 그리드 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
