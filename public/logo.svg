@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="chart" x1="80" y1="400" x2="432" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="candle-up" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="candle-down" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  
+  <!-- Subtle grid lines -->
+  <g opacity="0.06" stroke="#94a3b8" stroke-width="1">
+    <line x1="80" y1="130" x2="432" y2="130"/>
+    <line x1="80" y1="200" x2="432" y2="200"/>
+    <line x1="80" y1="270" x2="432" y2="270"/>
+    <line x1="80" y1="340" x2="432" y2="340"/>
+  </g>
+  
+  <!-- Candlesticks -->
+  <!-- Candle 1 - down -->
+  <line x1="120" y1="180" x2="120" y2="330" stroke="#dc2626" stroke-width="3" opacity="0.7"/>
+  <rect x="108" y="210" width="24" height="80" rx="3" fill="url(#candle-down)" opacity="0.8"/>
+  
+  <!-- Candle 2 - up -->
+  <line x1="175" y1="200" x2="175" y2="340" stroke="#16a34a" stroke-width="3" opacity="0.7"/>
+  <rect x="163" y="230" width="24" height="70" rx="3" fill="url(#candle-up)" opacity="0.8"/>
+  
+  <!-- Candle 3 - down -->
+  <line x1="230" y1="160" x2="230" y2="310" stroke="#dc2626" stroke-width="3" opacity="0.7"/>
+  <rect x="218" y="190" width="24" height="85" rx="3" fill="url(#candle-down)" opacity="0.8"/>
+  
+  <!-- Candle 4 - up (big) -->
+  <line x1="285" y1="140" x2="285" y2="280" stroke="#16a34a" stroke-width="3" opacity="0.8"/>
+  <rect x="273" y="155" width="24" height="90" rx="3" fill="url(#candle-up)" opacity="0.9"/>
+  
+  <!-- Candle 5 - up -->
+  <line x1="340" y1="120" x2="340" y2="250" stroke="#16a34a" stroke-width="3" opacity="0.8"/>
+  <rect x="328" y="135" width="24" height="75" rx="3" fill="url(#candle-up)" opacity="0.9"/>
+  
+  <!-- Candle 6 - up (strongest) -->
+  <line x1="395" y1="95" x2="395" y2="220" stroke="#16a34a" stroke-width="3" opacity="0.9"/>
+  <rect x="383" y="105" width="24" height="80" rx="3" fill="url(#candle-up)"/>
+  
+  <!-- Trend line with glow -->
+  <polyline 
+    points="120,260 175,270 230,240 285,200 340,170 395,140" 
+    fill="none" 
+    stroke="url(#chart)" 
+    stroke-width="4" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+    filter="url(#glow)"
+    opacity="0.9"
+  />
+  
+  <!-- Area fill under trend -->
+  <polygon 
+    points="120,260 175,270 230,240 285,200 340,170 395,140 395,380 120,380" 
+    fill="url(#chart)" 
+    opacity="0.08"
+  />
+  
+  <!-- 주식갤 text -->
+  <text x="256" y="430" text-anchor="middle" font-family="'Noto Sans KR', sans-serif" font-weight="900" font-size="72" fill="white" letter-spacing="8">주식갤</text>
+  
+  <!-- Accent dot -->
+  <circle cx="395" cy="140" r="8" fill="#22d3ee" filter="url(#glow)" opacity="0.9"/>
+</svg>

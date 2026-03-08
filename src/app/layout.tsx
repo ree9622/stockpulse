@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   title: "주식갤 | 한국 주식 실시간 정보",
   description: "실시간 주식 정보, 히트맵, 뉴스, 트래쉬토크 커뮤니티",
   manifest: "/stockpulse/manifest.json",
+  icons: {
+    icon: [
+      { url: "/stockpulse/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/stockpulse/favicon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -32,7 +38,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="format-detection" content="telephone=no" />
-        <link rel="apple-touch-icon" href="/stockpulse/icon-192.svg" />
+        <link rel="icon" type="image/svg+xml" href="/stockpulse/favicon.svg" />
+        <link rel="apple-touch-icon" href="/stockpulse/favicon.svg" />
       </head>
       <body className="bg-[#0a0a0f] dark:bg-[#0a0a0f] text-gray-200 dark:text-gray-200 antialiased min-h-[100dvh] overscroll-none">
         <SessionProvider>{children}</SessionProvider>

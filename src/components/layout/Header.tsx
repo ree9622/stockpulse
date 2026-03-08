@@ -118,7 +118,8 @@ export default function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/stockpulse/favicon.svg" alt="주식갤" className="w-6 h-6 sm:w-7 sm:h-7" />
             <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
               주식갤
             </span>
