@@ -25,8 +25,17 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
+
+      # API routes 임시 제외 (static export 호환)
+      - run: mv src/app/api src/app/_api_disabled
+
       - run: pnpm build
+
+      # 복원
+      - run: mv src/app/_api_disabled src/app/api
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

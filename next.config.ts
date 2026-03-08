@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: "export" removed — API routes & SSR require Node server
+  output: "export",
   basePath: "/stockpulse",
   assetPrefix: "/stockpulse/",
 };
