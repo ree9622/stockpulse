@@ -13,6 +13,7 @@ const TABLES = {
   stocks: "stockpulse-stocks",
   users: "stockpulse-users",
   alerts: "stockpulse-alerts",
+  briefings: "stockpulse-briefings",
 } as const;
 
 // ━━━ Chat ━━━
@@ -39,11 +40,11 @@ export async function getChatMessages(room: string, limit = 50) {
       TableName: TABLES.chat,
       KeyConditionExpression: "room = :r",
       ExpressionAttributeValues: { ":r": room },
-      ScanIndexForward: false, // 최신순
+      ScanIndexForward: false,
       Limit: limit,
     })
   );
-  return (result.Items || []).reverse(); // 시간순 정렬
+  return (result.Items || []).reverse();
 }
 
 // ━━━ News ━━━
@@ -182,6 +183,53 @@ export async function deleteAlert(userId: string, createdAt: number) {
       Key: { userId, createdAt },
     })
   );
+}
+
+// ━━━ Briefings ━━━
+
+export async function putBriefing(briefing: {
+  date: string;
+  threads: unknown[];
+  marketData?: unknown;
+  generatedBy?: string;
+}) {
+  const timestamp = Date.now();
+  await ddb.send(
+    new PutCommand({
+      TableName: TABLES.briefings,
+      Item: { ...briefing, timestamp },
+    })
+  );
+  return { ...briefing, timestamp };
+}
+
+export async function getBriefings(date: string, limit = 20) {
+  const result = await ddb.send(
+    new QueryCommand({
+      TableName: TABLES.briefings,
+      KeyConditionExpression: "#d = :d",
+      ExpressionAttributeNames: { "#d": "date" },
+      ExpressionAttributeValues: { ":d": date },
+      ScanIndexForward: false,
+      Limit: limit,
+    })
+  );
+  return result.Items || [];
+}
+
+export async function getRecentBriefings(limit = 10) {
+  const dates: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(Date.now() - i * 86400000);
+    dates.push(d.toISOString().split("T")[0]);
+  }
+  const results: unknown[] = [];
+  for (const date of dates) {
+    const items = await getBriefings(date, limit);
+    results.push(...items);
+    if (results.length >= limit) break;
+  }
+  return results.slice(0, limit);
 }
 
 export { ddb, TABLES };
