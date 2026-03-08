@@ -1,13 +1,60 @@
 "use client";
 
-import { trendingStocks } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { trendingStocks as mockStocks } from "@/lib/mock-data";
 import { formatPrice, formatPercent, formatNumber, getChangeColor } from "@/lib/utils";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import type { Stock } from "@/types";
 
 export default function TrendingStocks() {
+  const [stocks, setStocks] = useState<Stock[]>(mockStocks);
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchStocks = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/stockpulse/api/stocks?type=trending");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.stocks && data.stocks.length > 0) {
+          setStocks(data.stocks);
+          setLastUpdated(new Date());
+        }
+      }
+    } catch {
+      // fallback to mock data (already set)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStocks();
+    const interval = setInterval(fetchStocks, 60_000); // 1분마다 갱신
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="bg-[#12121a] rounded-xl border border-gray-800/50 p-4">
-      <h2 className="text-sm font-semibold text-gray-200 mb-3">🔥 실시간 인기 종목</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-gray-200">🔥 실시간 인기 종목</h2>
+        <div className="flex items-center gap-2">
+          {lastUpdated && (
+            <span className="text-[10px] text-gray-600">
+              {lastUpdated.toLocaleTimeString("ko-KR")} 업데이트
+            </span>
+          )}
+          <button
+            onClick={fetchStocks}
+            disabled={loading}
+            className="p-1 text-gray-500 hover:text-emerald-400 transition-colors disabled:animate-spin"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -21,16 +68,18 @@ export default function TrendingStocks() {
             </tr>
           </thead>
           <tbody>
-            {trendingStocks.map((stock) => (
+            {stocks.map((stock) => (
               <tr
                 key={stock.code}
                 className="border-b border-gray-800/30 hover:bg-gray-800/30 cursor-pointer transition-colors"
               >
                 <td className="py-2.5 pr-2">
-                  <div>
-                    <div className="text-gray-200 font-medium text-sm">{stock.name}</div>
+                  <Link href={`/stockpulse/stock/${stock.code}`} className="block">
+                    <div className="text-gray-200 font-medium text-sm hover:text-emerald-400 transition-colors">
+                      {stock.name}
+                    </div>
                     <div className="text-gray-500 text-xs">{stock.code}</div>
-                  </div>
+                  </Link>
                 </td>
                 <td className={`text-right py-2.5 px-2 font-mono ${getChangeColor(stock.change)}`}>
                   {formatPrice(stock.price)}

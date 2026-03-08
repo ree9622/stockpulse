@@ -1,39 +1,106 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Users, ChevronDown, Flame, Hash } from "lucide-react";
-import { mockMessages, chatRooms } from "@/lib/mock-data";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { MessageCircle, X, Send, Users, ChevronDown, Hash } from "lucide-react";
+import { chatRooms } from "@/lib/mock-data";
 import type { ChatMessage } from "@/types";
 import { timeAgo } from "@/lib/utils";
+import { io, Socket } from "socket.io-client";
+
+// 랜덤 닉네임 생성
+const NICKNAMES = ["불타는곰", "삼전만년", "방산드림", "개미투자자", "차트쟁이", "워렌이형", "코인충", "국장탈출"];
+const myNickname = NICKNAMES[Math.floor(Math.random() * NICKNAMES.length)];
+const myUserId = `user-${Math.random().toString(36).slice(2, 8)}`;
 
 export default function ChatPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeRoom, setActiveRoom] = useState("trashtalk");
-  const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [showRooms, setShowRooms] = useState(false);
+  const [userCount, setUserCount] = useState(0);
+  const [connected, setConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   const currentRoom = chatRooms.find((r) => r.id === activeRoom)!;
   const roomMessages = messages.filter((m) => m.room === activeRoom);
+
+  // Socket.io 연결
+  const connectSocket = useCallback(() => {
+    if (socketRef.current?.connected) return;
+
+    const socket = io({
+      path: "/stockpulse/socket.io",
+      transports: ["websocket", "polling"],
+    });
+
+    socket.on("connect", () => {
+      setConnected(true);
+      socket.emit("join-room", activeRoom);
+    });
+
+    socket.on("disconnect", () => {
+      setConnected(false);
+    });
+
+    socket.on("recent-messages", (msgs: ChatMessage[]) => {
+      setMessages((prev) => {
+        // 기존 메시지와 서버 메시지 병합 (현재 방만)
+        const otherRoomMsgs = prev.filter((m) => m.room !== activeRoom);
+        const serverMsgs = msgs.map((m) => ({
+          ...m,
+          timestamp: new Date(m.timestamp),
+        }));
+        return [...otherRoomMsgs, ...serverMsgs];
+      });
+    });
+
+    socket.on("new-message", (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, { ...msg, timestamp: new Date(msg.timestamp) }]);
+    });
+
+    socket.on("user-count", (data: { room: string; count: number }) => {
+      if (data.room === activeRoom) {
+        setUserCount(data.count);
+      }
+    });
+
+    socketRef.current = socket;
+  }, [activeRoom]);
+
+  // 패널 열릴 때 소켓 연결
+  useEffect(() => {
+    if (isOpen) {
+      connectSocket();
+    }
+    return () => {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+    };
+  }, [isOpen, connectSocket]);
+
+  // 방 변경 시
+  useEffect(() => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("join-room", activeRoom);
+    }
+  }, [activeRoom]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [roomMessages.length, isOpen]);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMsg: ChatMessage = {
-      id: Date.now().toString(),
-      userId: "me",
-      nickname: "나",
-      content: input.trim(),
-      timestamp: new Date(),
+    if (!input.trim() || !socketRef.current?.connected) return;
+    socketRef.current.emit("send-message", {
       room: activeRoom,
-    };
-    setMessages((prev) => [...prev, newMsg]);
+      userId: myUserId,
+      nickname: myNickname,
+      content: input.trim(),
+    });
     setInput("");
     inputRef.current?.focus();
   };
@@ -53,10 +120,6 @@ export default function ChatPanel() {
         className="fixed bottom-5 right-5 z-50 bg-emerald-500 hover:bg-emerald-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 group"
       >
         <MessageCircle className="w-6 h-6" />
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-          {roomMessages.length}
-        </span>
-        {/* Pulse */}
         <span className="absolute inset-0 rounded-full bg-emerald-500/30 animate-ping" />
       </button>
     );
@@ -79,8 +142,13 @@ export default function ChatPanel() {
           <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showRooms ? "rotate-180" : ""}`} />
           <span className="flex items-center gap-1 text-xs text-gray-500 ml-2">
             <Users className="w-3 h-3" />
-            {currentRoom.userCount}
+            <span className={connected ? "text-emerald-400" : "text-gray-600"}>
+              {userCount > 0 ? userCount : currentRoom.userCount}
+            </span>
           </span>
+          {!connected && (
+            <span className="text-[10px] text-yellow-500">연결 중...</span>
+          )}
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -133,13 +201,12 @@ export default function ChatPanel() {
           roomMessages.map((msg) => (
             <div key={msg.id} className="group">
               <div className="flex items-start gap-2">
-                {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {msg.nickname[0]}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-bold ${msg.userId === "me" ? "text-emerald-400" : "text-gray-300"}`}>
+                    <span className={`text-xs font-bold ${msg.userId === myUserId ? "text-emerald-400" : "text-gray-300"}`}>
                       {msg.nickname}
                     </span>
                     <span className="text-[10px] text-gray-600">{timeAgo(msg.timestamp)}</span>
@@ -167,7 +234,7 @@ export default function ChatPanel() {
           />
           <button
             onClick={sendMessage}
-            disabled={!input.trim()}
+            disabled={!input.trim() || !connected}
             className="p-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors"
           >
             <Send className="w-4 h-4" />

@@ -1,13 +1,37 @@
 "use client";
 
-import { marketIndices } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { marketIndices as mockIndices } from "@/lib/mock-data";
 import { formatPercent, getChangeColor } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import type { MarketIndex } from "@/types";
 
 export default function MarketOverview() {
+  const [indices, setIndices] = useState<MarketIndex[]>(mockIndices);
+
+  useEffect(() => {
+    const fetchIndices = async () => {
+      try {
+        const res = await fetch("/stockpulse/api/stocks?type=indices");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.indices && data.indices.length > 0) {
+            setIndices(data.indices);
+          }
+        }
+      } catch {
+        // fallback to mock
+      }
+    };
+
+    fetchIndices();
+    const interval = setInterval(fetchIndices, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      {marketIndices.slice(0, 8).map((index) => (
+      {indices.slice(0, 8).map((index) => (
         <div
           key={index.name}
           className="bg-[#12121a] rounded-xl border border-gray-800/50 p-3 hover:border-gray-700/50 transition-colors cursor-pointer"
