@@ -1,37 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Fuel, BarChart3, ExternalLink } from "lucide-react";
 
 const WIDGETS = [
-  { symbol: "TVC:USOIL", label: "WTI 원유", color: "#ef4444" },
-  { symbol: "TVC:UKOIL", label: "브렌트유", color: "#f97316" },
-  { symbol: "TVC:NATGAS", label: "천연가스", color: "#3b82f6" },
+  { symbol: "NYMEX:CL1!", label: "WTI 선물", color: "#ef4444" },
+  { symbol: "ICEEUR:BRN1!", label: "브렌트 선물", color: "#f97316" },
+  { symbol: "NYMEX:NG1!", label: "천연가스 선물", color: "#3b82f6" },
   { symbol: "KRX:KOSPI200", label: "KOSPI200", color: "#10b981" },
   { symbol: "FOREXCOM:XAUUSD", label: "금 현물", color: "#eab308" },
   { symbol: "FX_IDC:USDKRW", label: "USD/KRW", color: "#8b5cf6" },
 ];
 
-function MiniChart({ symbol, label, color }: { symbol: string; label: string; color: string }) {
-  const widgetHtml = `
-    <div class="tradingview-widget-container" style="height:100%;width:100%">
-      <iframe
-        scrolling="no"
-        allowtransparency="true"
-        frameborder="0"
-        src="https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=kr&symbol=${encodeURIComponent(symbol)}&dateRange=1D&colorTheme=dark&isTransparent=true&autosize=true&largeChartUrl=https://www.tradingview.com/chart/?symbol=${encodeURIComponent(symbol)}"
-        style="box-sizing:border-box;height:100%;width:100%"
-      ></iframe>
-    </div>
-  `;
+function TradingViewWidget({ symbol, label, color }: { symbol: string; label: string; color: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    containerRef.current.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.src = "https://s.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      symbols: [[symbol, label]],
+      chartOnly: false,
+      width: "100%",
+      height: "100%",
+      locale: "kr",
+      colorTheme: "dark",
+      autosize: true,
+      showVolume: false,
+      showMA: false,
+      hideDateRanges: false,
+      hideMarketStatus: false,
+      hideSymbolLogo: false,
+      scalePosition: "no",
+      scaleMode: "Normal",
+      fontFamily: "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+      fontSize: "10",
+      noTimeScale: false,
+      valuesTracking: "1",
+      changeMode: "price-and-percent",
+      chartType: "area",
+      lineWidth: 2,
+      lineColor: color,
+      topColor: `${color}33`,
+      bottomColor: `${color}00`,
+      dateRanges: ["1d|1", "1w|15", "1m|60", "3m|1D"],
+      isTransparent: true,
+    });
+
+    containerRef.current.appendChild(script);
+  }, [symbol, label, color]);
 
   return (
-    <div className="bg-gray-800/30 rounded-lg border border-gray-700/30 overflow-hidden" style={{ minHeight: "160px" }}>
-      <div className="px-2 pt-1.5 flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-        <span className="text-[11px] font-semibold text-gray-300">{label}</span>
-      </div>
-      <div style={{ height: "140px" }} dangerouslySetInnerHTML={{ __html: widgetHtml }} />
+    <div className="bg-gray-800/30 rounded-lg border border-gray-700/30 overflow-hidden" style={{ minHeight: "180px" }}>
+      <div
+        ref={containerRef}
+        className="tradingview-widget-container"
+        style={{ height: "180px", width: "100%" }}
+      />
     </div>
   );
 }
@@ -67,9 +96,9 @@ export default function EnergyDashboard() {
       </div>
 
       {expanded && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {WIDGETS.map((w) => (
-            <MiniChart key={w.symbol} {...w} />
+            <TradingViewWidget key={w.symbol} {...w} />
           ))}
         </div>
       )}
