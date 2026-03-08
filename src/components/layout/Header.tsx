@@ -4,6 +4,7 @@ import { Search, Bell, TrendingUp } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { searchStocks, type StockListItem } from "@/lib/stock-list";
+import AuthButton from "./AuthButton";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -139,9 +140,7 @@ export default function Header() {
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
-          <button className="px-3 py-1.5 bg-emerald-500/15 text-emerald-400 rounded-lg text-sm font-medium hover:bg-emerald-500/25 transition-colors">
-            로그인
-          </button>
+          <AuthButton />
         </div>
       </div>
     </header>

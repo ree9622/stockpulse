@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SessionProvider from "@/components/layout/SessionProvider";
 
 export const metadata: Metadata = {
   title: "StockPulse | 한국 주식 실시간 정보",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className="bg-[#0a0a0f] text-gray-200 antialiased min-h-screen">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
