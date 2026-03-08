@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Fuel, BarChart3, ExternalLink } from "lucide-react";
 
 const WIDGETS = [
-  { symbol: "NYMEX:CL1!", label: "WTI 원유", color: "#ef4444" },
-  { symbol: "NYMEX:BRN1!", label: "브렌트유", color: "#f97316" },
-  { symbol: "NYMEX:NG1!", label: "천연가스", color: "#3b82f6" },
-  { symbol: "KRX:101S6000", label: "KOSPI200 야간선물", color: "#10b981" },
+  { symbol: "TVC:USOIL", label: "WTI 원유", color: "#ef4444" },
+  { symbol: "TVC:UKOIL", label: "브렌트유", color: "#f97316" },
+  { symbol: "TVC:NATGAS", label: "천연가스", color: "#3b82f6" },
+  { symbol: "KRX:KOSPI200", label: "KOSPI200", color: "#10b981" },
   { symbol: "FOREXCOM:XAUUSD", label: "금 현물", color: "#eab308" },
   { symbol: "FX_IDC:USDKRW", label: "USD/KRW", color: "#8b5cf6" },
 ];
