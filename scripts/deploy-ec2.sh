@@ -52,9 +52,13 @@ for k, v in data.items():
 " >> .env.local
 
 cat >> .env.local << ENVEOF
-NEXTAUTH_URL=http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):3000/stockpulse
 NODE_ENV=production
 ENVEOF
+
+# NEXTAUTH_URL이 Secrets Manager에 없으면 폴백 추가
+if ! grep -q "^NEXTAUTH_URL=" .env.local; then
+  echo "NEXTAUTH_URL=https://stockgall.click/stockpulse" >> .env.local
+fi
 
 echo "🔨 Building..."
 pnpm build
