@@ -3,57 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Fuel, BarChart3, ExternalLink, Moon } from "lucide-react";
 
-/* ── 야간선물 차트 (TradingView Advanced Chart) ── */
-function NightFuturesChart({ symbol, title }: { symbol: string; title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const id = `tv_night_${symbol.replace(/[^a-zA-Z0-9]/g, "_")}`;
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    containerRef.current.innerHTML = `<div id="${id}" style="height:100%;width:100%"></div>`;
-
-    const script = document.createElement("script");
-    script.src = "https://s.tradingview.com/tv.js";
-    script.async = true;
-    script.onload = () => {
-      // @ts-expect-error TradingView global
-      if (window.TradingView) {
-        // @ts-expect-error TradingView global
-        new window.TradingView.widget({
-          container_id: id,
-          symbol: symbol,
-          interval: "5",
-          timezone: "Asia/Seoul",
-          theme: "dark",
-          style: "1",
-          locale: "kr",
-          toolbar_bottom: true,
-          hide_top_toolbar: false,
-          hide_side_toolbar: true,
-          allow_symbol_change: false,
-          save_image: false,
-          withdateranges: true,
-          autosize: true,
-          backgroundColor: "rgba(0,0,0,0)",
-          gridColor: "rgba(255,255,255,0.03)",
-        });
-      }
-    };
-    containerRef.current.appendChild(script);
-  }, [symbol, id]);
-
-  return (
-    <div className="bg-gray-800/20 rounded-lg border border-gray-700/30 overflow-hidden">
-      <div className="px-3 pt-2 pb-1 flex items-center gap-2 border-b border-gray-800/30">
-        <Moon className="w-3.5 h-3.5 text-yellow-400" />
-        <span className="text-xs font-semibold text-gray-300">{title}</span>
-        <span className="text-[10px] text-gray-500 ml-auto">야간 18:00~06:00</span>
-      </div>
-      <div ref={containerRef} style={{ height: "300px" }} />
-    </div>
-  );
-}
-
 /* ── 원자재 위젯 (symbol-overview) ── */
 function CommodityWidget({ symbol, label, color }: { symbol: string; label: string; color: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -145,10 +94,29 @@ export default function EnergyDashboard() {
 
       {expanded && (
         <>
-          {/* 야간선물 차트 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <NightFuturesChart symbol="KRX:101V6000" title="코스피 야간선물 (KOSPI 200)" />
-            <NightFuturesChart symbol="KRX:106V6000" title="코스닥 야간선물 (KOSDAQ 150)" />
+          {/* 야간선물 — longshortnow.com 임베드 */}
+          <div className="bg-gray-800/20 rounded-lg border border-gray-700/30 overflow-hidden">
+            <div className="px-3 py-2 flex items-center gap-2 border-b border-gray-800/30">
+              <Moon className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="text-xs font-semibold text-gray-300">코스피·코스닥 야간선물</span>
+              <span className="text-[10px] text-gray-500 ml-1">18:00 ~ 06:00</span>
+              <a
+                href="https://longshortnow.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto text-[10px] text-gray-500 hover:text-cyan-400 flex items-center gap-1 transition-colors"
+              >
+                longshortnow.com <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </div>
+            <iframe
+              src="https://longshortnow.com"
+              className="w-full border-0"
+              style={{ height: "480px" }}
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin"
+              title="롱숏나우 야간선물"
+            />
           </div>
 
           {/* 원자재 */}
