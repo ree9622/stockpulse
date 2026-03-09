@@ -105,9 +105,9 @@ function CommodityWidget({ symbol, label, color }: { symbol: string; label: stri
 }
 
 const COMMODITIES = [
-  { symbol: "NYMEX:CL1!", label: "WTI 선물", color: "#ef4444" },
-  { symbol: "ICEEUR:BRN1!", label: "브렌트 선물", color: "#f97316" },
-  { symbol: "NYMEX:NG1!", label: "천연가스 선물", color: "#3b82f6" },
+  { symbol: "TVC:USOIL", label: "WTI 원유", color: "#ef4444" },
+  { symbol: "TVC:UKOIL", label: "브렌트유", color: "#f97316" },
+  { symbol: "PEPPERSTONE:NATGAS", label: "천연가스", color: "#3b82f6" },
   { symbol: "FOREXCOM:XAUUSD", label: "금 현물", color: "#eab308" },
   { symbol: "FX_IDC:USDKRW", label: "USD/KRW", color: "#8b5cf6" },
 ];
